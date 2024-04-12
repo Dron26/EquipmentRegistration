@@ -51,7 +51,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         private bool _isBoxInputed;
         private bool _isEquipmentInputed;
         private bool _isTrolleyInputed;
-        Dictionary<int, Equipment> _freeBoxes = new Dictionary<int, Equipment>();
+        private Dictionary<int, Equipment> _freeBoxes = new Dictionary<int, Equipment>();
 
         public delegate void ActionWithTextNumber(string textNumber);
 
@@ -187,7 +187,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _inputTrolleyField.Select();
             _inputTrolleyField.ActivateInputField();
             _applyTrolleyButton.interactable = true;
-            
+
             _okButton.gameObject.SetActive(false);
             _nokButton.gameObject.SetActive(false);
         }
@@ -229,8 +229,8 @@ namespace CodeBase.Infrastracture.AdditionalPanels
 
         public bool IsBoxValidate()
         {
-            string text=_inputBoxField.text;
-            
+            string text = _inputBoxField.text;
+
             foreach (var box in _boxes)
             {
                 if (text == box.Key)
@@ -241,15 +241,15 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                 }
             }
 
-            
-            if (IsAllDigits(text)&& !text.Contains(" "))
+
+            if (IsAllDigits(text) && !text.Contains(" "))
             {
                 SentLogMessage("Введен новый ящик:  " + _inputBoxField.text, "");
                 _isBoxInputed = true;
                 _inputEquipmentField.interactable = true;
                 _inputEquipmentField.Select();
                 _inputEquipmentField.ActivateInputField();
-                
+
                 _okButton.gameObject.SetActive(true);
                 _nokButton.gameObject.SetActive(false);
             }
@@ -257,7 +257,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             {
                 return false;
             }
-           
+
 
             return true;
         }
@@ -274,14 +274,14 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                 }
             }
 
-            if (_inputEquipmentField.text.Length>3)
+            if (_inputEquipmentField.text.Length > 3)
             {
                 SentLogMessage("Введен новый сканер:  " + _inputEquipmentField.text, "");
                 _isEquipmentInputed = true;
                 return true;
             }
+
             return false;
-               
         }
 
         private void AddedBox()
@@ -330,7 +330,9 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                 _nokButton.gameObject.SetActive(true);
             }
         }
+
         bool IsAllDigits(string s) => s.All(char.IsDigit);
+
         public bool IsTrolleyValidate()
         {
             foreach (var trolley in _trolleys)
@@ -342,14 +344,13 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                     return false;
                 }
             }
-            
-            
-            
+
+
             if (IsAllDigits(_inputTrolleyField.text))
             {
                 SentLogMessage("Введена новая рохля:  " + _inputBoxField.text, "");
                 _isTrolleyInputed = true;
-                
+
                 _okButton.gameObject.SetActive(false);
                 _nokButton.gameObject.SetActive(false);
             }
@@ -395,28 +396,28 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             Reset();
             Work();
         }
-        
+
         private void ResetEquipmentInput()
         {
             SentLogMessage("Выполнен сброс при вводе оборудования", "сброс ящик/cканер");
             Reset();
-            Work(); 
+            Work();
         }
 
         private void ResetTrolleyInput()
         {
             SentLogMessage("Выполнен сброс рохли", "сброс рохли");
             Reset();
-            Work(); 
+            Work();
         }
 
         public void SwithState(bool state)
         {
             _panel.gameObject.SetActive(state);
-            
+
             if (state)
             {
-                SentLogMessage("-> Добавить","");
+                SentLogMessage("-> Добавить", "");
             }
         }
 

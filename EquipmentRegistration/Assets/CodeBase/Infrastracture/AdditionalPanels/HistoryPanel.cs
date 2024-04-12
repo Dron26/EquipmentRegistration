@@ -23,13 +23,14 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         [SerializeField] private Button _priviousButton;
         [SerializeField] private int _startLine;
         [SerializeField] private int _endLine;
+        
         private string _selectedFile;
         public Action OnBackButtonCLick;
         private string _equipmentName = " - рохля №";
         private string textBase = "Текущее состояние ";
         private SaveLoadService _saveLoadService;
         private int _maxLength = 400;
-        List<string> _logs = new List<string>();
+        private List<string> _logs = new List<string>();
 
         public void Init(SaveLoadService saveLoadService)
         {

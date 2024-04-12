@@ -12,7 +12,6 @@ namespace CodeBase.Infrastracture.TrolleyGroup
         public Trolley(string number)
         {
             Number = number;
-            
         }
         
         public void SetBusy(bool state)

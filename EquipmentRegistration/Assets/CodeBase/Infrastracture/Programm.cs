@@ -223,7 +223,6 @@ namespace CodeBase.Infrastracture
             }
             else if (window == _mainSwithMenu)
             {
-                _mainSwithMenu.Reset();
                 _mainSwithMenu.SwithState(false);
                 Reset();
             }

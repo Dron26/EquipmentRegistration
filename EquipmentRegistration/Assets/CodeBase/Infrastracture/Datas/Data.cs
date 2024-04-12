@@ -16,18 +16,19 @@ namespace CodeBase.Infrastracture.Datas
         [Serialize] public List<Trolley> _trollyes = new();
         [Serialize] public Employee Employee;
         [Serialize] public Employee _employee;
-        
+
         private int _currentIndex;
-        public Data(List<Employee> employees, List<Box> boxes,List<Trolley> trollyes)
+
+        public Data(List<Employee> employees, List<Box> boxes, List<Trolley> trollyes)
         {
             foreach (var employee in employees)
             {
                 Employee newEmployee = new Employee(employee.Login, employee.Password, employee.Permission);
-                
+
                 if (employee.HaveBox)
                 {
                     newEmployee.SetBox(employee.Box);
-                    newEmployee.SetEquipmentData( employee.DateTakenEquipment);
+                    newEmployee.SetEquipmentData(employee.DateTakenEquipment);
                 }
 
                 if (employee.HaveTrolley)
@@ -35,7 +36,7 @@ namespace CodeBase.Infrastracture.Datas
                     newEmployee.SetTrolley(employee.Trolley);
                     newEmployee.Trolley.SetBusy(true);
                 }
-                
+
                 _employees.Add(newEmployee);
             }
 
@@ -46,7 +47,7 @@ namespace CodeBase.Infrastracture.Datas
                 _boxes.Add(newBox);
                 _keys.Add(Convert.ToInt32(box.Key));
             }
-            
+
             foreach (var trolly in trollyes)
             {
                 Trolley newTrolley = new Trolley(trolly.Number);
@@ -57,14 +58,14 @@ namespace CodeBase.Infrastracture.Datas
 
         public void SetCurrentEmployeer(Employee employee)
         {
-            
             foreach (var thisEmployee in _employees)
             {
                 if (thisEmployee.Login == employee.Login)
                 {
                     _currentIndex = _employees.IndexOf(thisEmployee);
-                    _employees[_currentIndex] = new(employee.Login, employee.Password, employee.Permission); ;
-                    
+                    _employees[_currentIndex] = new(employee.Login, employee.Password, employee.Permission);
+                    ;
+
                     if (employee.HaveBox)
                     {
                         Box box = new Box(employee.Box.Key, employee.Box.Equipment);
@@ -79,7 +80,7 @@ namespace CodeBase.Infrastracture.Datas
                     }
 
                     Employee = _employees[_currentIndex];
-                    
+
                     break;
                 }
             }
@@ -88,10 +89,10 @@ namespace CodeBase.Infrastracture.Datas
         public void SetBox(Box box)
         {
             int key = Convert.ToInt32(box.Key);
-            
+
             if (_keys.Contains(key))
             {
-                int index=_boxes.IndexOf(_boxes.Find(x => x.Key == box.Key));
+                int index = _boxes.IndexOf(_boxes.Find(x => x.Key == box.Key));
                 _boxes[index].SetBusy(box.Busy);
             }
             else
@@ -100,7 +101,7 @@ namespace CodeBase.Infrastracture.Datas
                 _keys.Add(Convert.ToInt32(box.Key));
             }
         }
-        
+
         public List<Box> GetBoxes()
         {
             return new List<Box>(_boxes);
@@ -117,7 +118,7 @@ namespace CodeBase.Infrastracture.Datas
 
             foreach (Trolley thisTrolley in _trollyes)
             {
-                if (thisTrolley.Number==trolley.Number)
+                if (thisTrolley.Number == trolley.Number)
                 {
                     thisTrolley.Busy = trolley.Busy;
                     changed = true;
@@ -130,11 +131,12 @@ namespace CodeBase.Infrastracture.Datas
                 _trollyes.Add(trolley);
             }
         }
-        
+
         public List<Employee> GetEmployees()
         {
-            return new List<Employee>(_employees)   ;
+            return new List<Employee>(_employees);
         }
+
         public void AddNewEmployee(Employee employee)
         {
             foreach (var thisEmployee in _employees)
@@ -143,11 +145,11 @@ namespace CodeBase.Infrastracture.Datas
                 {
                     int index = _employees.IndexOf(thisEmployee);
 
-                    if (index<_currentIndex)
+                    if (index < _currentIndex)
                     {
                         _currentIndex--;
                     }
-                    
+
                     break;
                 }
             }

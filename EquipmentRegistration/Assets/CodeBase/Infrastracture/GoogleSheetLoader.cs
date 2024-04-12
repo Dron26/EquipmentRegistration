@@ -7,10 +7,8 @@ using UnityEngine;
 [RequireComponent(typeof(CVSLoader), typeof(SheetProcessor))]
 public class GoogleSheetLoader : MonoBehaviour
 {
-    public event Action<WebData> OnProcessData;
-    
     [SerializeField] private WebData _data;
-    
+    public event Action<WebData> OnProcessData;
     private CVSLoader _cvsLoader;
     private SheetProcessor _sheetProcessor;
 
@@ -39,14 +37,11 @@ public class WebData
     public List<Employee> Employees;
     public List<Box> Boxes;
     public List<Trolley> Trolleys;
-    
+
     public override string ToString()
     {
         string result = "";
-        Employees.ForEach(o =>
-        {
-            result += o.ToString();
-        });
+        Employees.ForEach(o => { result += o.ToString(); });
         return result;
     }
 }

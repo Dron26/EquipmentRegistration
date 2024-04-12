@@ -28,7 +28,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         private SaveLoadService _saveLoadService;
         private List<Box> _busyBoxes = new();
         private Employee _employee;
-        Dictionary<int,Equipment> _freeBoxes = new Dictionary<int,Equipment>();
+        private Dictionary<int,Equipment> _freeBoxes = new Dictionary<int,Equipment>();
         private string _applyText = ": подтвердил выбор ";
         public bool _canTakeKey = false;
         public bool _canTakeTsd = false;

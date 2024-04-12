@@ -26,7 +26,6 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         [SerializeField] private TMP_Text _loginRepeatText;
 
         public Action OnBackButtonCLick;
-        
         private List<GameObject> _employeesListItems = new List<GameObject>();
         private SaveLoadService _saveLoadService;
         private List<Employee> _employees = new();

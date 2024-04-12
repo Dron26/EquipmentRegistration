@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemChecker:MonoBehaviour
+public class ItemChecker : MonoBehaviour
 {
     [SerializeField] private GameObject _panelLogin;
     [SerializeField] private GameObject _panelKey;
@@ -10,7 +10,7 @@ public class ItemChecker:MonoBehaviour
     {
         return _panelLogin;
     }
-    
+
     public GameObject GetKey()
     {
         return _panelKey;

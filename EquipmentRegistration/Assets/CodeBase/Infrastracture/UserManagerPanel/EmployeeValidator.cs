@@ -15,7 +15,6 @@ namespace CodeBase.Infrastracture.UserManagerPanel
         [SerializeField] private TMP_InputField _inputHideField;
         [SerializeField] private Button _resetInput;
 
-
         public Action IsLogged;
         public Action InputCorrectPassword;
         public Action OnInputReset;
@@ -141,7 +140,7 @@ namespace CodeBase.Infrastracture.UserManagerPanel
                         string key = "*";
                         string shortNumber = "*";
                         string time = DateTime.Now.ToString();
-                        
+
                         if (_newEmployee != _saveLoadService.Employee)
                         {
                             _saveLoadService.SetCurrentEmployee(_newEmployee);
@@ -199,8 +198,6 @@ namespace CodeBase.Infrastracture.UserManagerPanel
                 Reset();
             }
 
-            // DateTime now = DateTime.Now; 
-            // Debug.Log(now);
             if (_isLogStart == false)
             {
                 _isLogStart = true;
@@ -247,7 +244,7 @@ namespace CodeBase.Infrastracture.UserManagerPanel
 
             int length = _inputPassField.text.Length;
             _inputHideField.text = new string(_simbol, length);
-            
+
             if (_isPassStart == false)
             {
                 _isPassStart = true;

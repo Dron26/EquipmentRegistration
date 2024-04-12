@@ -32,21 +32,16 @@ namespace CodeBase.Infrastracture
             AddListeners();
         }
 
-
         private void SetButtonState()
         {
             _getEquipmentButton.gameObject.SetActive(_isSelectedEquipment);
 
             _getTrolleyButton.gameObject.SetActive(_isSelectedTrolley);
         }
+
         public void Work()
         {
             SwithState(false);
-        }
-        
-        public void Reset()
-        {
-            
         }
 
         public void HandleGetEquipmentButton()
@@ -54,7 +49,7 @@ namespace CodeBase.Infrastracture
             SentLogMessage(_saveLoadService.Employee.Login + _textSelectEquipment);
             OnSelectEquipment.Invoke();
         }
-    
+
         public void HandleReturnEquipmentButton()
         {
             SentLogMessage(_saveLoadService.Employee.Login + _textSelectTrolley);
@@ -68,8 +63,8 @@ namespace CodeBase.Infrastracture
             if (state)
             {
                 _employeeLogin.text = "Привет !  " + _saveLoadService.Employee.Login;
-                _isSelectedEquipment= _saveLoadService.GetSwithStatus().IsEquipmentSelected;
-                _isSelectedTrolley=_saveLoadService.GetSwithStatus().IsTrolleySelected;
+                _isSelectedEquipment = _saveLoadService.GetSwithStatus().IsEquipmentSelected;
+                _isSelectedTrolley = _saveLoadService.GetSwithStatus().IsTrolleySelected;
                 SetButtonState();
             }
             else
@@ -77,6 +72,7 @@ namespace CodeBase.Infrastracture
                 _employeeLogin.text = "";
             }
         }
+
         private void AddListeners()
         {
             _getEquipmentButton.onClick.AddListener(HandleGetEquipmentButton);
@@ -106,6 +102,5 @@ namespace CodeBase.Infrastracture
         {
             RemuveListeners();
         }
-        
     }
 }

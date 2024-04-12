@@ -19,7 +19,6 @@ public class DeleteEquipmentPanel : MonoBehaviour
     [SerializeField] private GameObject _viweport;
     [SerializeField] private GameObject _mainItem;
     [SerializeField] private GameObject _mainTrolleyItem;
-    
     [SerializeField] private Button _equipmentButton;
     [SerializeField] private Button _trolleyButton;
     [SerializeField] private Button _resetEquipmentInputTextButton;
@@ -37,23 +36,21 @@ public class DeleteEquipmentPanel : MonoBehaviour
     [SerializeField] private GameObject _equipmentTextPanel;
 
     public Action OnBackButtonCLick;
+
     private Employee _registeredEmployee;
     private SaveLoadService _saveLoadService;
-
     private List<Box> _boxes = new();
     private List<Box> _busyBoxes = new();
     private List<Trolley> _trolleys = new();
-
-    private GameObject _tempEquipmentGroup;
-    private GameObject _tempTrolleyGroup;
     private List<GameObject> _equipmentGroups = new();
     private List<GameObject> _trolleyGroups = new();
+    private GameObject _tempEquipmentGroup;
+    private GameObject _tempTrolleyGroup;
     private WarningPanel _warningPanel;
-
     private bool _isReseted;
     private Box _selectedForDeleteBox;
     private Trolley _selectedForDeleteTrolley;
-    Dictionary<int, Equipment> _freeBoxes = new Dictionary<int, Equipment>();
+    private Dictionary<int, Equipment> _freeBoxes = new Dictionary<int, Equipment>();
 
     public delegate void ActionWithTextNumber(string textNumber);
 
@@ -84,6 +81,7 @@ public class DeleteEquipmentPanel : MonoBehaviour
         _equipmentButton.interactable = true;
         _trolleyButton.interactable = true;
     }
+
     public void Reset()
     {
         _isReseted = true;
@@ -101,16 +99,19 @@ public class DeleteEquipmentPanel : MonoBehaviour
             button.onClick.RemoveListener(() => SelectBox(""));
             Destroy(gameObject);
         }
+
         foreach (var gameObject in _trolleyGroups)
         {
             Button button = gameObject.GetComponent<Button>();
             button.onClick.RemoveListener(() => SelectTrolley(""));
             Destroy(gameObject);
         }
+
         _equipmentGroups.Clear();
         _trolleyGroups.Clear();
         _isReseted = false;
     }
+
     private void FillEquipmentList()
     {
         _tempEquipmentGroup.SetActive(true);
@@ -160,7 +161,6 @@ public class DeleteEquipmentPanel : MonoBehaviour
 
     private void FillTrolleyList()
     {
-        
         _tempTrolleyGroup.SetActive(true);
         _trolleys = _saveLoadService.GetTrolleys();
         SortTrolleys();
@@ -196,7 +196,7 @@ public class DeleteEquipmentPanel : MonoBehaviour
     private void SelectBox(string textKey)
     {
         ChangeStateAction(SelectBox);
-        _selectedForDeleteBox=_boxes.FirstOrDefault(x => x.Key == textKey);
+        _selectedForDeleteBox = _boxes.FirstOrDefault(x => x.Key == textKey);
         SentLogMessage("Выбран ящик " + _selectedForDeleteBox.Key, "");
         SetBoxInfo();
     }
@@ -205,7 +205,7 @@ public class DeleteEquipmentPanel : MonoBehaviour
     {
         ChangeStateAction(SelectTrolley);
 
-        _selectedForDeleteTrolley = _trolleys.FirstOrDefault(x=>x.Number==textNumber);
+        _selectedForDeleteTrolley = _trolleys.FirstOrDefault(x => x.Number == textNumber);
         SentLogMessage("Выбрана рохля " + _selectedForDeleteTrolley.Number, "");
         SetTrolleyInfo();
     }
@@ -215,6 +215,7 @@ public class DeleteEquipmentPanel : MonoBehaviour
         _boxText.text = _selectedForDeleteBox.Key;
         _equipmentText.text = _selectedForDeleteBox.Equipment.SerialNumber[^4..];
     }
+
     private void SetTrolleyInfo()
     {
         _trolleyText.text = _selectedForDeleteTrolley.Number;
@@ -265,10 +266,10 @@ public class DeleteEquipmentPanel : MonoBehaviour
         Reset();
         Work();
     }
-    
+
     private void ChangeStateAction(ActionWithTextNumber action)
     {
-        if (action ==SelectTrolley )
+        if (action == SelectTrolley)
         {
             _trolleyPanel.SetActive(true);
             _equipmentPanel.SetActive(false);
@@ -281,7 +282,7 @@ public class DeleteEquipmentPanel : MonoBehaviour
             _boxDeleteButton.interactable = true;
         }
     }
-    
+
     private void OnApplyAddedEmployee()
     {
         _okButton.gameObject.SetActive(false);
@@ -344,7 +345,8 @@ public class DeleteEquipmentPanel : MonoBehaviour
         _tempTrolleyGroup.SetActive(true);
         _tempEquipmentGroup.SetActive(false);
         _scroll.content = _tempTrolleyGroup.GetComponent<RectTransform>();
-        _scroll.verticalScrollbar.value = 1;    }
+        _scroll.verticalScrollbar.value = 1;
+    }
 
     private void SelectEquipmentGroup()
     {
@@ -367,7 +369,7 @@ public class DeleteEquipmentPanel : MonoBehaviour
         _trolleyButton.onClick.RemoveListener(SelectTrolleyGroup);
         _equipmentButton.onClick.RemoveListener(SelectEquipmentGroup);
     }
-    
+
     public void OnCLickBackButton()
     {
         SentLogMessage("<- Назад ", "");

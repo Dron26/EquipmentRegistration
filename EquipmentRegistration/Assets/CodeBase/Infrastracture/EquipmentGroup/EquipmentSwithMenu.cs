@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using CodeBase.Infrastracture.Datas;
-using CodeBase.Infrastracture.TrolleyGroup;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +19,6 @@ namespace CodeBase.Infrastracture.EquipmentGroup
 
         private SaveLoadService _saveLoadService;
         private WarningPanel _warningPanel;
-
         private string _textGetEquipment = " : пытается получить сканер";
         private string _textReturnEquipment = " : пытается вернуть сканер";
         private bool _haveFreeEquipment;
@@ -94,11 +92,13 @@ namespace CodeBase.Infrastracture.EquipmentGroup
                     if (_saveLoadService.GetCurrentEmployee().DateTakenEquipment != DateTime.Now.Day)
                     {
                         _warningPanel.ShowWindow(WindowNames.NotReturnYesterday.ToString());
-                        SentDataMessage(new SentData(" Просроченный возврат оборудования", _saveLoadService.GetCurrentEmployee().Login, _saveLoadService.GetCurrentEmployee().Password,
+                        SentDataMessage(new SentData(" Просроченный возврат оборудования",
+                            _saveLoadService.GetCurrentEmployee().Login, _saveLoadService.GetCurrentEmployee().Password,
                             _saveLoadService.GetCurrentEmployee().Box.Key,
-                            _saveLoadService.GetCurrentEmployee().Box.Equipment.SerialNumber[^4..], DateTime.Now.ToString(), "Block"));
+                            _saveLoadService.GetCurrentEmployee().Box.Equipment.SerialNumber[^4..],
+                            DateTime.Now.ToString(), "Block"));
                     }
-                    
+
                     _returnEquipmentButton.gameObject.SetActive(true);
                     _getEquipmentButton.gameObject.SetActive(false);
                 }
@@ -143,7 +143,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         {
             _saveLoadService.SentLogInfo(message, "");
         }
-        
+
         private void SentDataMessage(SentData message)
         {
             _saveLoadService.SentDataInfo(message);

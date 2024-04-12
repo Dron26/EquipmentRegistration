@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using CodeBase.Infrastracture;
 using CodeBase.Infrastracture.Datas;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.AdditionalPanels
@@ -91,7 +89,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         {
             _okPanel.gameObject.SetActive(false);
             _nokPanel.gameObject.SetActive(false);
-            
+
             if (_isResetEquipmentSelected)
             {
                 SentLogMessage("Отмена выбора сотрудника для сброса оборудования", "");
@@ -147,10 +145,10 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _selectedEmployee = _data[button];
             SentLogMessage("Выбран сотрудник " + _selectedEmployee.Login, "");
             ResetPanels();
-            
+
             _okPanel.gameObject.SetActive(false);
             _nokPanel.gameObject.SetActive(false);
-            
+
             if (_selectedEmployee.HaveBox)
             {
                 _resetEquipmentButton.interactable = true;
@@ -259,7 +257,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                 _applyEquimpmentButton.interactable = false;
             }
         }
-        
+
         private void ResetPanels()
         {
             _resetEquipmentButton.interactable = false;
@@ -399,7 +397,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _applyTrolleyButton.onClick.AddListener(ApplyTrolleyAction);
             _applyEquimpmentButton.onClick.AddListener(ApplyEquipmentAction);
             _backButton.onClick.AddListener(OnCLickBackButton);
-            _newPassTextInput.onValueChanged.AddListener(delegate { OnValueChangedPassInput();});
+            _newPassTextInput.onValueChanged.AddListener(delegate { OnValueChangedPassInput(); });
         }
 
         private void OnValueChangedPassInput()
@@ -407,7 +405,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             int length = _newPassTextInput.text.Length;
             _hideText.text = new string(_simbol, length);
         }
-        
+
         private void RemuveListeners()
         {
             _resetEquipmentButton.onClick.RemoveListener(ResetEquipment);
@@ -418,7 +416,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _applyTrolleyButton.onClick.RemoveListener(ApplyTrolleyAction);
             _applyEquimpmentButton.onClick.RemoveListener(ApplyEquipmentAction);
             _backButton.onClick.RemoveListener(OnCLickBackButton);
-            _newPassTextInput.onValueChanged.RemoveListener(delegate { OnValueChangedPassInput();});
+            _newPassTextInput.onValueChanged.RemoveListener(delegate { OnValueChangedPassInput(); });
         }
 
         private void SentLogMessage(string message, string comment)

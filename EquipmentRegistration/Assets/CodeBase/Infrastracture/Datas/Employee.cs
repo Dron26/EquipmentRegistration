@@ -31,10 +31,10 @@ namespace CodeBase.Infrastracture.Datas
         public Box GetBox()
         {
             Box oldBox = new(Box.Key, Box.Equipment);
-            Equipment=new Equipment("");
+            Equipment = new Equipment("");
             Box = null;
             HaveBox = false;
-            HaveEquipment= false;
+            HaveEquipment = false;
             DateTakenEquipment = 0;
             return oldBox;
         }
@@ -46,23 +46,23 @@ namespace CodeBase.Infrastracture.Datas
             Equipment = Box.Equipment;
             HaveEquipment = true;
         }
-        
+
         public void SetPermision(string permission)
         {
             Permission = permission;
         }
-        
+
         public void SetPassword(string password)
         {
             Password = password;
         }
-        
+
         public void SetTrolley(Trolley trolley)
         {
-            HaveTrolley= true;
+            HaveTrolley = true;
             Trolley = new Trolley(trolley.Number);
         }
-        
+
         public Trolley GetTrolley()
         {
             Trolley oldTrolley = Trolley;
@@ -70,7 +70,7 @@ namespace CodeBase.Infrastracture.Datas
             HaveTrolley = false;
             return oldTrolley;
         }
-        
+
         public void SetEquipmentData(int day)
         {
             DateTakenEquipment = day;

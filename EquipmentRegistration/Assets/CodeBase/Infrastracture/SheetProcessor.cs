@@ -14,10 +14,8 @@ public class SheetProcessor : MonoBehaviour
     private const int _serialNumber = 3;
     private const int _key = 4;
     private const int _trolleNumber = 5;
-
     private const char _cellSeporator = ',';
-    
-    
+
     public WebData ProcessData(string cvsRawData)
     {
         char lineEnding = GetPlatformSpecificLineEnd();
@@ -56,7 +54,6 @@ public class SheetProcessor : MonoBehaviour
                  
                  data.Trolleys.Add(trolley);
             }
-            
         }
         
         return data;

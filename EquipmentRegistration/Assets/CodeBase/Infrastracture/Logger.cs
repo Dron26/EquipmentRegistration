@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CodeBase.Infrastracture.Datas;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ namespace CodeBase.Infrastracture
     public class Logger : MonoBehaviour
     {
         [SerializeField] private RequestQueue _requestQueue;
-        
+
         private Queue<SentData> _queue = new Queue<SentData>();
         private Uri uri = null;
         private int _maxCountDay = 8;
@@ -55,9 +54,9 @@ namespace CodeBase.Infrastracture
 
         public void SendTrolleyData(SentData data)
         {
-            
-             _requestQueue.EnqueueTrolleyData(data);
+            _requestQueue.EnqueueTrolleyData(data);
         }
+
         public void CheckTime()
         {
             List<string> consts = new List<string>();
@@ -89,7 +88,8 @@ namespace CodeBase.Infrastracture
 
                             if (thresholdDate <= DateTime.Now)
                             {
-                                string newPath = Path.Combine(Application.persistentDataPath, date.ToString("dd.MM.yyyy"), filename);
+                                string newPath = Path.Combine(Application.persistentDataPath,
+                                    date.ToString("dd.MM.yyyy"), filename);
                                 File.Copy(path, newPath);
                             }
                         }
@@ -123,7 +123,6 @@ namespace CodeBase.Infrastracture
                 {
                     writer.WriteLine(content); // Дописываем данные в новую строку
                 }
-
             }
             catch (Exception e)
             {

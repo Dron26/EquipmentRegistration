@@ -47,21 +47,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             _CheckDown.enabled = true;
             _CheckUp.enabled = false;
         }
-        private void UpdatePassText()
-        {
-           
-        }
-        // private void Update()
-        // {
-        //     if (Input.GetKeyDown(KeyCode.Tab))
-        //     {
-        //         if (_isSerialNumberInputed == false)
-        //         {
-        //             SentLogMessage(_employee.Login + ": отсканировал неверный QR", "");
-        //         }
-        //     }
-        // }
-
+        
         private void OnApplyButtonClick()
         {
             SentDataMessage(new SentData("Возврат оборудования ", _employee.Login, _employee.Password, _employee.Box.Key,

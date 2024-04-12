@@ -85,7 +85,7 @@ namespace CodeBase.Infrastracture
             _filePathOfflineLog = Path.Combine(Application.persistentDataPath, _filePathOfflineLog);
             _filePathOfflineTrolley = Path.Combine(Application.persistentDataPath, _filePathOfflineTrolley);
             AddListeners();
-            
+
             if (File.Exists(_filePathOfflineLog))
             {
                 string json = File.ReadAllText(_filePathOfflineLog);
@@ -160,7 +160,7 @@ namespace CodeBase.Infrastracture
                 else
                 {
                     _queueData.Enqueue(data);
-            
+
                     if (!_isProcessingData)
                     {
                         StartCoroutine(ProcessDataQueue());
@@ -193,7 +193,7 @@ namespace CodeBase.Infrastracture
                 else
                 {
                     _queueLog.Enqueue(data);
-            
+
                     if (!_isProcessingLog)
                     {
                         StartCoroutine(ProcessLogQueue());
@@ -226,7 +226,7 @@ namespace CodeBase.Infrastracture
                 else
                 {
                     _queueTrolleyData.Enqueue(data);
-            
+
                     if (!_isProcessingTrolleyData)
                     {
                         StartCoroutine(ProcessTrolleyDataQueue());

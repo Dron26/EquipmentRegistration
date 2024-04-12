@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.EquipmentGroup
 {
-    public class EquipmentRegistrationMenu : MonoBehaviour,IWindow
+    public class EquipmentRegistrationMenu : MonoBehaviour, IWindow
     {
         [SerializeField] private EquipmentResult _equipmentResult;
         [SerializeField] private Button _buttonApply;
@@ -18,9 +18,9 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         public Action OnRegistrationEnd;
         public Action OnApplyRegistration;
         public Action OnBackButtonCLick;
-        
+
         private SaveLoadService _saveLoadService;
-        
+
         public void Init(SaveLoadService saveLoadService)
         {
             _saveLoadService = saveLoadService;
@@ -49,7 +49,6 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             Reset();
         }
 
-       
 
         private void OnGetEquipment()
         {
@@ -68,7 +67,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         public void SwitchValidatorState(bool state)
         {
             _validator.SwithState(state);
-            
+
             if (state)
             {
                 _validator.Work();
@@ -85,7 +84,6 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             _buttonApply.onClick.AddListener(OnApplyButtonClick);
             _buttonApplyResult.onClick.AddListener(OnResultButtonClick);
             _backButton.onClick.AddListener(OnCLickBackButton);
-
         }
 
         private void RemuveListeners()
