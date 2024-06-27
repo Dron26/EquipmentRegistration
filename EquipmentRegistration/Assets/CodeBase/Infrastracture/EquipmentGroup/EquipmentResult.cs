@@ -2,6 +2,8 @@ using System;
 using CodeBase.Infrastracture.Datas;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Experimental.AI;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.EquipmentGroup
@@ -9,10 +11,11 @@ namespace CodeBase.Infrastracture.EquipmentGroup
     public class EquipmentResult : MonoBehaviour
     {
         [SerializeField] private GameObject _resultPanel;
-        [SerializeField] private TMP_Text _employeeField;
-        [SerializeField] private TMP_Text _keyField;
-        [SerializeField] private TMP_Text _tsdField;
-        
+        [SerializeField] private TMP_Text _employee;
+        [SerializeField] private TMP_Text _key;
+        [SerializeField] private TMP_Text _tsd;
+        [SerializeField] private TMP_Text _printer;
+
         private Data _data;
         private SaveLoadService _saveLoadService;
 
@@ -30,21 +33,32 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         {
             _data = _saveLoadService.Database;
             SwithState(true);
-            _employeeField.text = _data.Employee.Login;
-            _keyField.text = _data.Employee.Box.Key;
-            _tsdField.text = _data.Employee.Equipment.SerialNumber[^4..];;
+            SetText();
+        }
+
+        private void SetText()
+        {
+            _employee.text = _data.Employee.Login;
+            _key.text = _data.Employee.Box.Key;
+            _tsd.text = _data.Employee.Equipment.SerialNumber[^4..];
+            
+            if (_data.Employee.HavePrinter)
+            {
+                _printer.text = _data.Employee.Printer.SerialNumber[^4..];
+            }
         }
 
         public void SwithState(bool state)
         {
             _resultPanel.gameObject.SetActive(state);
         }
-
+      
         public void Reset()
         {
-            _employeeField.text = "";
-            _keyField.text = "";
-            _tsdField.text = "";
+            _employee.text = "";
+            _key.text = "";
+            _tsd.text = "";
+            _printer.text = "";
         }
     }
 }

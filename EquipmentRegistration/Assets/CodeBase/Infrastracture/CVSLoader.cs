@@ -21,6 +21,7 @@ public class CVSLoader : MonoBehaviour
             request.timeout = 30;
             
             yield return request.SendWebRequest();
+            
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError ||
                 request.result == UnityWebRequest.Result.DataProcessingError)
             {
@@ -30,8 +31,8 @@ public class CVSLoader : MonoBehaviour
             {
                 if (_debug)
                 {
-                    Debug.Log("Successful download");
-                    Debug.Log(request.downloadHandler.text);
+//   Debug.Log("Successful download");
+//                    Debug.Log(request.downloadHandler.text);
                 }
 
                 callback(request.downloadHandler.text);

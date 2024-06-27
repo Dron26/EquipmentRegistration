@@ -12,13 +12,16 @@ namespace CodeBase.Infrastracture.Datas
     {
         [SerializeField] private Logger _logger;
         public Data Database => _database;
-        public Employee Employee;
-        public Trolley SelectedTrolley => _selectedTrolley;
+        public Employee Employee ;
+        public Trolley SelectedTrolley=>_selectedTrolley;
         public bool IsDatabaseLoaded => _isDatabaseLoaded;
-        public SwithStatus SwithStatus => _swithStatus;
-        public Action OnSelectEquipment;
-        public Action OnSelectTrolley;
+        public SwithStatus SwithStatus=>_swithStatus;
+        public bool IsLogged => _isLogged;
 
+        public Action OnSelectEquipment;
+        public event Action ChangeLogStatus;
+        public Action OnSelectTrolley;
+        
         private Data _database;
         private SwithStatus _swithStatus;
         private string _filePathEmployees;
@@ -28,23 +31,26 @@ namespace CodeBase.Infrastracture.Datas
         private bool _isSelectedEquipment;
         private bool _isSelectetTrolley;
         private bool _isDatabaseLoaded;
+        private bool _isLogged;
+        private bool _isBuyed;
+        
         private Trolley _selectedTrolley;
 
         public void Init()
         {
+            _isLogged = true;
             _filePathEmployees = Path.Combine(Application.persistentDataPath, Const.EmployeesInfoJs);
-            _filePathBoxes = Path.Combine(Application.persistentDataPath, Const.BoxesInfoJs);
-            _filePathTrollies = Path.Combine(Application.persistentDataPath, Const.TrolliesInfoJs);
-            _filePathSettings = Path.Combine(Application.persistentDataPath, Const.SettingsInfoJs);
+            _filePathBoxes = Path.Combine(Application.persistentDataPath,  Const.BoxesInfoJs);
+            _filePathTrollies= Path.Combine(Application.persistentDataPath,  Const.TrolliesInfoJs);
+            _filePathSettings= Path.Combine(Application.persistentDataPath,  Const.SettingsInfoJs);
             GetSettings();
             _logger.Init(this);
             DontDestroyOnLoad(this);
             //_logger.CheckTime();
-
+            
             CreateBase();
             _database = LoadDatabase();
         }
-
         public void CreateBase()
         {
             List<Box> boxes;
@@ -54,8 +60,8 @@ namespace CodeBase.Infrastracture.Datas
             Box box = new Box("1", new Equipment("000001"));
             boxes = new List<Box>();
             boxes.Add(box);
-
-            Trolley trolley = new Trolley("1");
+            
+            Trolley trolley= new Trolley("1");
             List<Trolley> trollies = new List<Trolley>();
             trollies.Add(trolley);
 
@@ -63,7 +69,7 @@ namespace CodeBase.Infrastracture.Datas
             employee.SetPermision("2");
             employees = new List<Employee>();
             employees.Add(employee);
-            _database = new Data(employees, boxes, trollies);
+            _database = new Data(employees, boxes,trollies);
             //_database.SetCurrentEmployeer(_database.GetEmployees()[0]);
             SentLogIntroInfo("___________________________\n___________________________");
             SentLogIntroInfo("База данных успешно создана.");
@@ -73,7 +79,7 @@ namespace CodeBase.Infrastracture.Datas
         {
             if (File.Exists(_filePathSettings))
             {
-                string json = File.ReadAllText(_filePathSettings);
+               string  json = File.ReadAllText(_filePathSettings);
                 _swithStatus = JsonConvert.DeserializeObject<SwithStatus>(json);
             }
             else
@@ -110,7 +116,7 @@ namespace CodeBase.Infrastracture.Datas
             List<Box> boxes;
             List<Employee> employees;
             List<Trolley> trollies;
-
+            
             if (!File.Exists(_filePathEmployees))
             {
                 SaveDatabase();
@@ -131,11 +137,21 @@ namespace CodeBase.Infrastracture.Datas
                         {
                             newEmployee.SetBox(employee.Box);
                             newEmployee.SetEquipmentData(employee.DateTakenEquipment);
+                            
+                            if (employee.Box.Printer != null && employee.Box.Printer.SerialNumber != "")
+                            {
+                                newEmployee.Box.SetPrinter(employee.Box.Printer);
+                            }
                         }
 
                         if (employee.Trolley != null && employee.Trolley.Number != "")
                         {
                             newEmployee.SetTrolley(employee.Trolley);
+                        }
+
+                        if (employee.HavePrinter)
+                        {
+                            newEmployee.SetPrinter(employee.Printer);
                         }
 
                         employees.Add(newEmployee);
@@ -148,8 +164,8 @@ namespace CodeBase.Infrastracture.Datas
 
                     json = File.ReadAllText(_filePathSettings);
                     _swithStatus = JsonConvert.DeserializeObject<SwithStatus>(json);
-
-                    _database = new Data(employees, boxes, trollies);
+                    
+                    _database = new Data(employees, boxes,trollies);
                     //_database.SetCurrentEmployeer(_database.GetEmployees()[0]);
                     _isDatabaseLoaded = true;
 
@@ -164,9 +180,9 @@ namespace CodeBase.Infrastracture.Datas
             return _database;
         }
 
-        public void SetDatabase(List<Employee> employees, List<Box> boxes, List<Trolley> trollyes)
+        public void SetDatabase(List<Employee> employees, List<Box> boxes,List<Trolley> trollyes)
         {
-            _database = new Data(employees, boxes, trollyes);
+            _database = new Data(employees, boxes,trollyes);
             SetCurrentEmployee(Employee);
             SaveDatabase();
         }
@@ -191,7 +207,6 @@ namespace CodeBase.Infrastracture.Datas
         {
             return _database.GetBoxes();
         }
-
         public void SetBox(Box box)
         {
             _database.SetBox(box);
@@ -202,10 +217,20 @@ namespace CodeBase.Infrastracture.Datas
         {
             return _database.GetTrolleys();
         }
-
+        
         public void SetTrolley(Trolley trolley)
         {
             _database.SetTrolleys(trolley);
+        }
+        
+        public List<Printer> GetPinters()
+        {
+            return _database.GetPrinters();
+        }
+        
+        public void SetPrinter(Printer printer)
+        {
+            _database.SetPrinter(printer);
         }
 
         public void SentDataInfo(SentData sentData)
@@ -223,7 +248,6 @@ namespace CodeBase.Infrastracture.Datas
             SentData sentData = new SentData(action, "", "", "", "", "", "");
             _logger.SendLog(sentData);
         }
-
         public void SentDataTrolleyMessage(SentData sentData)
         {
             _logger.SendTrolleyData(sentData);
@@ -240,22 +264,28 @@ namespace CodeBase.Infrastracture.Datas
             _database.RemoveEmployee(employee);
             SaveDatabase();
         }
-
+        
         public void RemoveBox(Box box)
         {
             _database.RemoveBox(box);
             SaveDatabase();
         }
-
+        
         public void RemoveTrolley(Trolley trolley)
         {
             _database.RemoveTrolley(trolley);
             SaveDatabase();
         }
+        
+        public void RemovePrinter(Printer printer)
+        {
+            _database.RemovePrinter(printer);
+            SaveDatabase();
+        }
 
         public SwithStatus GetSwithStatus()
         {
-            return _swithStatus;
+           return _swithStatus;
         }
 
         public void SetSwithEquipmentState(bool isSelected)
@@ -264,7 +294,7 @@ namespace CodeBase.Infrastracture.Datas
             OnSelectEquipment.Invoke();
             SaveDatabase();
         }
-
+        
         public void SetSwithTrolleyState(bool isSelected)
         {
             _swithStatus.IsTrolleySelected = isSelected;
@@ -274,20 +304,17 @@ namespace CodeBase.Infrastracture.Datas
 
         public void SetSelectedTrolley(Trolley trolley)
         {
-            _selectedTrolley = trolley;
+            _selectedTrolley=trolley;
         }
-    }
-}
+        public void SetLoggedStatus(bool isActive)
+        {
+            _isLogged = isActive;
+            ChangeLogStatus?.Invoke();
+        }
 
-[Serializable]
-public class SwithStatus
-{
-    public bool IsEquipmentSelected;
-    public bool IsTrolleySelected;
-
-    public SwithStatus(bool state, bool state2)
-    {
-        IsEquipmentSelected = state;
-        IsTrolleySelected = state2;
+        public void SetSertificate()
+        {
+            
+        }
     }
 }

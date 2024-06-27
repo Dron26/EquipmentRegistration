@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CodeBase.Infrastracture.Datas;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.AdditionalPanels
@@ -49,7 +50,6 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         private int _permissionSecond;
         private int _permissionTerird;
         private int _permission;
-
         public void Init(SaveLoadService saveLoadService, WarningPanel warningPanel)
         {
             _saveLoadService = saveLoadService;
@@ -77,7 +77,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _permission = 0;
 
             _togglePanel.gameObject.SetActive(false);
-
+            
             if (CanSetPermission())
             {
                 _togglePanel.gameObject.SetActive(true);
@@ -86,7 +86,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
 
         private bool CanSetPermission()
         {
-            if (_saveLoadService.Employee.Permission == "2")
+            if (_saveLoadService.Employee.Permission=="2")
             {
                 return true;
             }
@@ -284,24 +284,24 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _okButton.onClick.AddListener(OnApplyAddedEmployee);
             _inputPassField.onValueChanged.AddListener(delegate { HideText(_inputPassField); });
             _inputRepeatPassField.onValueChanged.AddListener(delegate { HideText(_inputRepeatPassField); });
-            _togglePermissionFirst.onValueChanged.AddListener(delegate { OnChangePermission(_permissionFirst); });
-            _togglePermissionSecond.onValueChanged.AddListener(delegate { OnChangePermission(_permissionSecond); });
-            _togglePermissionTerird.onValueChanged.AddListener(delegate { OnChangePermission(_permissionTerird); });
+            _togglePermissionFirst.onValueChanged.AddListener(delegate { OnChangePermission(_permissionFirst);});
+            _togglePermissionSecond.onValueChanged.AddListener(delegate { OnChangePermission(_permissionSecond);});
+            _togglePermissionTerird.onValueChanged.AddListener(delegate { OnChangePermission(_permissionTerird);});
         }
 
         private void OnChangePermission(int permission)
         {
             _permission = permission;
             _togglePermissionFirst.isOn = false;
-            _togglePermissionSecond.isOn = false;
-            _togglePermissionTerird.isOn = false;
+            _togglePermissionSecond.isOn= false;
+                _togglePermissionTerird.isOn= false;
         }
 
-        private void HideText(TMP_InputField _inputField)
+        private void HideText(TMP_InputField _inputField )
         {
             int length = _inputField.text.Length;
-
-            if (!_inputRepeatPassField.interactable)
+            
+                if (!_inputRepeatPassField.interactable)
             {
                 _inputHideField.text = new string(_simbol, length);
             }
@@ -310,6 +310,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                 string text = new string(_simbol, length);
                 _inputRepeadHideField.text = text;
             }
+           
         }
 
         private void RemuveListeners()
@@ -321,9 +322,9 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _applyButton.onClick.RemoveListener(ValidateInput);
             _applyRepeatButton.onClick.RemoveListener(ValidateRepeatInput);
             _okButton.onClick.RemoveListener(OnApplyAddedEmployee);
-            _togglePermissionFirst.onValueChanged.RemoveListener(delegate { OnChangePermission(_permissionFirst); });
-            _togglePermissionSecond.onValueChanged.RemoveListener(delegate { OnChangePermission(_permissionSecond); });
-            _togglePermissionTerird.onValueChanged.RemoveListener(delegate { OnChangePermission(_permissionTerird); });
+            _togglePermissionFirst.onValueChanged.RemoveListener(delegate { OnChangePermission(_permissionFirst);});
+            _togglePermissionSecond.onValueChanged.RemoveListener(delegate { OnChangePermission(_permissionSecond);});
+            _togglePermissionTerird.onValueChanged.RemoveListener(delegate { OnChangePermission(_permissionTerird);});
         }
 
 

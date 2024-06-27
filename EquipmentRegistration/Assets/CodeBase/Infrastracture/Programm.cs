@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using CodeBase.Infrastracture.AdditionalPanels;
 using CodeBase.Infrastracture.Datas;
 using CodeBase.Infrastracture.EquipmentGroup;
@@ -12,6 +15,7 @@ namespace CodeBase.Infrastracture
 {
     public class Programm : MonoBehaviour
     {
+        EncryptionManager _encryptionManager;
         [SerializeField] private EmployeeRegistrationMenu _employeeRegistrationMenu;
         [SerializeField] private EquipmentRegistrationMenu _equipmentRegistrationMenu;
         [SerializeField] private TrolleyRegistrationMenu _trolleyRegistrationMenu;
@@ -43,9 +47,15 @@ namespace CodeBase.Infrastracture
         private bool _isRegistrationTrolleyEnd = false;
         private bool _isGetTrolleySelect = false;
 
-
+        
+        
+        
         public void Init(SaveLoadService saveLoadService)
         {
+           // string g= KeyEncryption.EncryptKey("Hello World");
+           //  KeyEncryption.Main();
+           //  _encryptionManager = new EncryptionManager();
+           //  _encryptionManager.CheckKey();
             _saveLoadService = saveLoadService;
             _additionalButton.gameObject.SetActive(false);
             _warningPanel.Init(_saveLoadService);
@@ -63,6 +73,7 @@ namespace CodeBase.Infrastracture
             DontDestroyOnLoad(this);
             AddListeners();
             SentLogMessage("Программа инизиализированна");
+            _adminPanel.CheckBuyed();
         }
 
         public void Work()
@@ -223,6 +234,7 @@ namespace CodeBase.Infrastracture
             }
             else if (window == _mainSwithMenu)
             {
+                _mainSwithMenu.Reset();
                 _mainSwithMenu.SwithState(false);
                 Reset();
             }
@@ -322,5 +334,41 @@ namespace CodeBase.Infrastracture
         {
             RemuveListeners();
         }
+    }
+}
+public class KeyEncryption
+{
+    private const string Key = "1B2C3D4E5F708192A3B4C5D6E7F80112"; 
+    private static readonly byte[] Iv = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+
+    public static string EncryptKey(string keyToEncrypt)
+    {
+        byte[] keyBytes = Encoding.UTF8.GetBytes(keyToEncrypt);
+
+        using (Aes aes = Aes.Create())
+        {
+            aes.Key = Encoding.UTF8.GetBytes(Key);
+            aes.IV = Iv;
+
+            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                {
+                    cs.Write(keyBytes, 0, keyBytes.Length);
+                }
+
+                byte[] encryptedKeyBytes = ms.ToArray();
+                return Convert.ToBase64String(encryptedKeyBytes);
+            }
+        }
+    }
+
+    public static void Main()
+    {
+        string expectedKeyString = "KJHSLKDJskdjflkdfsdjfiejslkj:LHJ:KFBLSJKFLKWJBEFKjbflkebflkjsbdvlkuehIFRBk>jb";
+        string encryptedKey = EncryptKey(expectedKeyString);
+        Console.WriteLine("Encrypted Key: " + encryptedKey);
     }
 }

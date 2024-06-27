@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CodeBase.Infrastracture.Datas;
 using UnityEngine;
 
@@ -9,25 +10,31 @@ namespace CodeBase.Infrastracture
     public class Logger : MonoBehaviour
     {
         [SerializeField] private RequestQueue _requestQueue;
-
+        
         private Queue<SentData> _queue = new Queue<SentData>();
         private Uri uri = null;
         private int _maxCountDay = 8;
         private bool _isAdditionalLogOn = false;
         private bool _isProcessing = false;
-
+        private bool _isLogged=true;
+        private SaveLoadService _saveLoadService;
         public void Init(SaveLoadService saveLoadService)
         {
-            _requestQueue.Init(saveLoadService);
+            _saveLoadService = saveLoadService;
+            _requestQueue.Init(_saveLoadService);
             DontDestroyOnLoad(_requestQueue);
             DontDestroyOnLoad(this);
+            SetLogStatus();
+            AddListeners();
         }
-
+        private void SetLogStatus()
+        {
+            _isLogged = _saveLoadService.IsLogged;
+        }
         public void WriteData(SentData data)
         {
             DateTime Time = DateTime.Now;
-            string info =
-                $"Time: {Time}, {data.Action},Login: {data.Login}, Password: {data.Pass}, Tsd: {data.ShortNumber}, Key: {data.Key} ";
+            string info = $"Time: {Time}, {data.Action},Login: {data.Login}, Password: {data.Pass}, Tsd: {data.ShortNumber}, Key: {data.Key},Comment ";
 
             AppendDataToFile(Const.DataInfo, info);
         }
@@ -42,21 +49,27 @@ namespace CodeBase.Infrastracture
 
         public void SendLog(SentData log)
         {
-            WriteLog(log);
-            _requestQueue.EnqueueLog(log);
+            if (_isLogged)
+            {
+                WriteLog(log);
+                _requestQueue.EnqueueLog(log);
+            }
         }
 
         public void SendData(SentData data)
         {
-            WriteData(data);
-            _requestQueue.EnqueueData(data);
+            if (_isLogged)
+            {
+                WriteData(data);
+                _requestQueue.EnqueueData(data);
+            }
         }
 
         public void SendTrolleyData(SentData data)
         {
-            _requestQueue.EnqueueTrolleyData(data);
+            
+             _requestQueue.EnqueueTrolleyData(data);
         }
-
         public void CheckTime()
         {
             List<string> consts = new List<string>();
@@ -88,8 +101,7 @@ namespace CodeBase.Infrastracture
 
                             if (thresholdDate <= DateTime.Now)
                             {
-                                string newPath = Path.Combine(Application.persistentDataPath,
-                                    date.ToString("dd.MM.yyyy"), filename);
+                                string newPath = Path.Combine(Application.persistentDataPath, date.ToString("dd.MM.yyyy"), filename);
                                 File.Copy(path, newPath);
                             }
                         }
@@ -123,10 +135,24 @@ namespace CodeBase.Infrastracture
                 {
                     writer.WriteLine(content); // Дописываем данные в новую строку
                 }
+
             }
             catch (Exception e)
             {
             }
+        }
+        
+        private void AddListeners()
+        {
+            _saveLoadService.ChangeLogStatus += SetLogStatus;
+        }
+
+        
+
+
+        private void RemoveListeners()
+        {
+            _saveLoadService.ChangeLogStatus -= SetLogStatus;
         }
     }
 }

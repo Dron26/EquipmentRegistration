@@ -10,17 +10,24 @@ namespace CodeBase.Infrastracture.EquipmentGroup
     public class EquipmentReturnMenu : MonoBehaviour, IWindow
     {
         [SerializeField] private GameObject _panel;
+        [SerializeField] private GameObject _equipmentPanel;
+        [SerializeField] private GameObject _printerPanel;
+        [SerializeField] private GameObject _demoPrinter;
         [SerializeField] private Button _buttonApply;
         [SerializeField] private TMP_Text _employeeField;
         [SerializeField] private TMP_Text _keyField;
         [SerializeField] private TMP_Text _tsdField;
+        [SerializeField] private TMP_Text _printerField;
         [SerializeField] private TMP_InputField _inputReturnField;
+        [SerializeField] private TMP_InputField _inputReturnPrinterField;
         [SerializeField] private Button _resetInput;
         [SerializeField] private Image _CheckUp;
         [SerializeField] private Image _CheckDown;
+        [SerializeField] private Image _CheckUpPrinter;
+        [SerializeField] private Image _CheckDownPrinter;
         [SerializeField] private Button _backButton;
         [SerializeField] private TMP_Text _inputHideField;
-
+        [SerializeField] private TMP_Text _inputPrinterHideField;
         public Action OnBackButtonCLick;
         
         private char _simbol = '*';
@@ -29,7 +36,8 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         private WarningPanel _warningPanel;
         private bool _isReseted;
         private bool _isSerialNumberInputed;
-
+        private bool _isSerialNumberPrinterInputed;
+        private bool _mustReturnPrinter;
         public void Init(SaveLoadService saveLoadService, WarningPanel warningPanel)
         {
             _saveLoadService = saveLoadService;
@@ -43,11 +51,29 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             _inputReturnField.Select();
             _inputReturnField.ActivateInputField();
             _inputReturnField.interactable = true;
+            _inputReturnPrinterField.interactable = false;
             _buttonApply.interactable = false;
             _CheckDown.enabled = true;
             _CheckUp.enabled = false;
+            _equipmentPanel.SetActive(true);
+            _printerPanel.SetActive(false);
+            _demoPrinter.SetActive(false);
         }
-        
+        private void UpdatePassText()
+        {
+           
+        }
+        // private void Update()
+        // {
+        //     if (Input.GetKeyDown(KeyCode.Tab))
+        //     {
+        //         if (_isSerialNumberInputed == false)
+        //         {
+        //             SentLogMessage(_employee.Login + ": отсканировал неверный QR", "");
+        //         }
+        //     }
+        // }
+
         private void OnApplyButtonClick()
         {
             SentDataMessage(new SentData("Возврат оборудования ", _employee.Login, _employee.Password, _employee.Box.Key,
@@ -66,6 +92,10 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             _employeeField.text = _employee.Login;
             _keyField.text = _employee.Box.Key;
             _tsdField.text = _employee.Equipment.SerialNumber[^4..];
+            if (_employee.HavePrinter)
+            {
+                _printerField.text = _employee.Printer.SerialNumber[^4..];
+            }
         }
 
         public void Reset()
@@ -74,16 +104,24 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             _employeeField.text = "";
             _keyField.text = "";
             _tsdField.text = "";
+            _printerField.text = "";
             _inputHideField.text = "";
+            _inputPrinterHideField.text = "";
             _inputReturnField.text = null;
             _inputReturnField.interactable = true;
             _inputReturnField.ActivateInputField();
             _inputReturnField.Select();
+            _inputReturnPrinterField.text = "";
+            _inputReturnPrinterField.interactable = false;
             _buttonApply.interactable = false;
             _CheckDown.enabled = true;
             _CheckUp.enabled = false;
             _resetInput.interactable = false;
             _isSerialNumberInputed = false;
+            _isSerialNumberPrinterInputed = false;
+            _equipmentPanel.SetActive(true);
+            _printerPanel.SetActive(false);
+            _demoPrinter.SetActive(false);
             _isReseted = false;
         }
 
@@ -98,15 +136,68 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         {
             if (_isReseted == false)
             {
+                
                 CheckInput();
             }
         }
+        
+        public void ValidateReturnPrinter()
+        {
+            if (_isReseted == false)
+            {
+                CheckInputPrinter();
+            }
+        }
 
+
+        private void ShowReturnPrinterPanel()
+        {
+            _equipmentPanel.SetActive(false);
+            _printerPanel.SetActive(true);
+            _demoPrinter.SetActive(true);
+            _CheckDownPrinter.enabled = true;
+            _CheckUpPrinter.enabled = false;
+            _inputReturnPrinterField.interactable = true;
+            _inputReturnPrinterField.Select();
+            _inputReturnPrinterField.ActivateInputField();
+        }
+
+        private void CheckAvailabilityPrinter()
+        {
+            _mustReturnPrinter = _employee.Printer!=null;
+        }
+
+        private void CheckInputPrinter()
+        {
+            string text = _inputReturnPrinterField.text;
+            _inputPrinterHideField.text = new string(_simbol, _inputReturnPrinterField.text.Length);
+            
+            if (_inputReturnPrinterField.text != "")
+            {
+                _resetInput.interactable = true;
+            }
+            else
+            {
+                _resetInput.interactable = false;
+            }
+
+            if (text == _employee.Printer.SerialNumber && _isSerialNumberPrinterInputed == false)
+            {
+                SentLogMessage(_employee.Login + ": отсканировал верный QR Printer", "");
+
+                _isSerialNumberPrinterInputed = true;
+                _inputReturnPrinterField.interactable = false;
+                _buttonApply.interactable = true;
+                _CheckDownPrinter.enabled = false;
+                _CheckUpPrinter.enabled = true;
+            }
+        }
 
         private void CheckInput()
         {
             string text = _inputReturnField.text;
             _inputHideField.text = new string(_simbol, _inputReturnField.text.Length);
+            Debug.Log( text);
             if (_inputReturnField.text != "")
             {
                 _resetInput.interactable = true;
@@ -116,21 +207,30 @@ namespace CodeBase.Infrastracture.EquipmentGroup
                 _resetInput.interactable = false;
             }
 
-            if (text == _employee.Equipment.SerialNumber[^4..]|| text == _employee.Box.Equipment.SerialNumber[^5..] && _isSerialNumberInputed == false)
+            if (text == _employee.Equipment.SerialNumber[^4..] && _isSerialNumberInputed == false)
             {
                 SentLogMessage(_employee.Login + ": отсканировал верный QR", "");
 
                 _isSerialNumberInputed = true;
-                _inputReturnField.interactable = false;
-                _buttonApply.interactable = true;
-                _CheckDown.enabled = false;
-                _CheckUp.enabled = true;
+                CheckAvailabilityPrinter();
+                if (!_mustReturnPrinter )
+                {
+                    _inputReturnField.interactable = false;
+                    _buttonApply.interactable = true;
+                    _CheckDown.enabled = false;
+                    _CheckUp.enabled = true;
+                }
+                else
+                {
+                    ShowReturnPrinterPanel();
+                }
+                
             }
 
             if (_isSerialNumberInputed == false)
             {
                 List<Employee> employees = _saveLoadService.GetEmployees();
-
+            
                 try
                 {
                     foreach (var employee in employees)
@@ -166,6 +266,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         {
             _buttonApply.onClick.AddListener(OnApplyButtonClick);
             _inputReturnField.onValueChanged.AddListener(delegate { ValidateReturn(); });
+            _inputReturnPrinterField.onValueChanged.AddListener(delegate { ValidateReturnPrinter(); });
             _resetInput.onClick.AddListener(ResetInput);
             _backButton.onClick.AddListener(OnCLickBackButton);
         }
@@ -173,6 +274,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         private void RemuveListeners()
         {
             _inputReturnField.onValueChanged.RemoveListener(delegate { ValidateReturn(); });
+            _inputReturnPrinterField.onValueChanged.RemoveListener(delegate { ValidateReturnPrinter(); });
             _buttonApply.onClick.RemoveListener(OnApplyButtonClick);
             _resetInput.onClick.RemoveListener(ResetInput);
             _backButton.onClick.RemoveListener(OnCLickBackButton);

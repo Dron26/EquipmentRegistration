@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.EquipmentGroup
 {
-    public class EquipmentRegistrationMenu : MonoBehaviour, IWindow
+    public class EquipmentRegistrationMenu : MonoBehaviour,IWindow
     {
         [SerializeField] private EquipmentResult _equipmentResult;
-        [SerializeField] private Button _buttonApply;
+        //[SerializeField] private Button _buttonApply;
         [SerializeField] private Button _buttonApplyResult;
         [SerializeField] private Button _backButton;
         [SerializeField] private EquipmentValidator _validator;
@@ -18,9 +18,9 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         public Action OnRegistrationEnd;
         public Action OnApplyRegistration;
         public Action OnBackButtonCLick;
-
+        
         private SaveLoadService _saveLoadService;
-
+        
         public void Init(SaveLoadService saveLoadService)
         {
             _saveLoadService = saveLoadService;
@@ -32,14 +32,14 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         public void Work()
         {
             _equipmentResult.Work();
-            _buttonApply.interactable = false;
+ //           _buttonApply.interactable = false;
         }
 
         public void Reset()
         {
             _validator.Reset();
             _equipmentResult.Reset();
-            _buttonApply.interactable = false;
+  //          _buttonApply.interactable = false;
         }
 
         private void OnResultButtonClick()
@@ -49,10 +49,11 @@ namespace CodeBase.Infrastracture.EquipmentGroup
             Reset();
         }
 
+       
 
         private void OnGetEquipment()
         {
-            _buttonApply.interactable = true;
+ //           _buttonApply.interactable = true;
         }
 
         private void OnApplyButtonClick()
@@ -67,7 +68,7 @@ namespace CodeBase.Infrastracture.EquipmentGroup
         public void SwitchValidatorState(bool state)
         {
             _validator.SwithState(state);
-
+            
             if (state)
             {
                 _validator.Work();
@@ -80,16 +81,17 @@ namespace CodeBase.Infrastracture.EquipmentGroup
 
         private void AddListeners()
         {
-            _validator.OnTakeKey += OnGetEquipment;
-            _buttonApply.onClick.AddListener(OnApplyButtonClick);
+            _validator.OnTakeKey += OnApplyButtonClick;
+   //         _buttonApply.onClick.AddListener(OnApplyButtonClick);
             _buttonApplyResult.onClick.AddListener(OnResultButtonClick);
             _backButton.onClick.AddListener(OnCLickBackButton);
+
         }
 
         private void RemuveListeners()
         {
-            _validator.OnTakeKey -= OnGetEquipment;
-            _buttonApply.onClick.RemoveListener(OnApplyButtonClick);
+            _validator.OnTakeKey -= OnApplyButtonClick;
+     //       _buttonApply.onClick.RemoveListener(OnApplyButtonClick);
             _buttonApplyResult.onClick.RemoveListener(OnResultButtonClick);
             _backButton.onClick.RemoveListener(OnCLickBackButton);
         }

@@ -317,6 +317,7 @@ namespace CodeBase.Infrastracture
             string additionalSecond = "";
             string initiatorLogin = "";
             string comment = data.Comment;
+            string printerNumber = data.PrinterNumber;
             string time = GetCurrentTime();
 
             using (UnityWebRequest webRequest = UnityWebRequest.Post(BASE_URL, new WWWForm()))
@@ -336,6 +337,11 @@ namespace CodeBase.Infrastracture
                     form.AddField("entry.1279552655", additionalSecond);
                     form.AddField("entry.405360371", initiatorLogin);
                     form.AddField("entry.1208956316", comment);
+
+                    if (printerNumber != null)
+                    {
+                        form.AddField("entry.1752044536", printerNumber);
+                    }
                 }
                 else
                 {
@@ -597,7 +603,7 @@ namespace CodeBase.Infrastracture
         }
 
 
-        private void RemuveListeners()
+        private void RemoveListeners()
         {
             _saveLoadService.OnSelectEquipment -= SetURL;
             _saveLoadService.OnSelectTrolley -= SetURL;

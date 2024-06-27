@@ -3,9 +3,10 @@ using CodeBase.Infrastracture;
 using CodeBase.Infrastracture.AdditionalPanels;
 using CodeBase.Infrastracture.Datas;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class SwichEquipmentAction : MonoBehaviour
+public class SwichEquipmentAction:MonoBehaviour
 {
     [SerializeField] private Button _add;
     [SerializeField] private Button _delete;
@@ -22,7 +23,7 @@ public class SwichEquipmentAction : MonoBehaviour
     public void Init(SaveLoadService saveLoadService, WarningPanel warningPanel)
     {
         _saveLoadService = saveLoadService;
-        _deletePanel.Init(saveLoadService, warningPanel);
+        _deletePanel.Init( saveLoadService,  warningPanel);
         _addAddPanel.Init(saveLoadService, warningPanel);
         AddListeners();
     }
@@ -37,16 +38,17 @@ public class SwichEquipmentAction : MonoBehaviour
     {
         _addAddPanel.SwithState(true);
         _addAddPanel.Work();
-        SwithState(false);
+        SwithState( false);
+            
     }
 
     private void OnCLickDeleteButton()
-    {
+    { 
         _deletePanel.SwithState(true);
         _deletePanel.Work();
-        SwithState(false);
+        SwithState( false);
     }
-
+    
     public void SwithState(bool state)
     {
         _panel.gameObject.SetActive(state);
@@ -62,7 +64,6 @@ public class SwichEquipmentAction : MonoBehaviour
     {
         _saveLoadService.SentDataInfo(message);
     }
-
     private void AddListeners()
     {
         _add.onClick.AddListener(OnCLickAddButton);
@@ -83,8 +84,8 @@ public class SwichEquipmentAction : MonoBehaviour
 
     private void ReternFromChildren()
     {
-        SwithState(true);
-        Reset();
+        SwithState( true);
+       Reset();
     }
 
     public void OnCLickBackButton()

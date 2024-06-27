@@ -1,33 +1,43 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CodeBase.Infrastracture.Datas;
 using CodeBase.Infrastracture.EquipmentGroup;
 using CodeBase.Infrastracture.TrolleyGroup;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.AdditionalPanels
 {
     public class AdminPanel : MonoBehaviour, IWindow
     {
+        
         [SerializeField] private CVSLoader _cvsLoader;
         [SerializeField] private GoogleSheetLoader _googleSheetLoader;
         [SerializeField] private Button _apply;
         [SerializeField] private GameObject _panelOk;
         [SerializeField] private GameObject _panelNok;
+
         [SerializeField] private Button _swithPlatform;
+        
         [SerializeField] private TMP_InputField _inputLoggPass;
         [SerializeField] private TMP_InputField _inputBoxes;
         [SerializeField] private TMP_InputField _inputTrolleys;
         [SerializeField] private GameObject _panel;
         [SerializeField] private Button _backButton;
+
         [SerializeField] private Toggle _toggleEquipment;
         [SerializeField] private Toggle _toggleTrolleys;
+        
         [SerializeField] private TMP_InputField _inputUrlId;
         [SerializeField] private Button _setUrlId;
         [SerializeField] private Button _setWebData;
+        [SerializeField] private Toggle _loggedStatus;
+        
         public Action<List<Employee>, List<Box>, List<Trolley>> Loaded;
         public Action OnBackButtonCLick;
         public bool isLoadedEmployees = false;
@@ -35,6 +45,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         public bool isLoadedTrolleys = false;
         public bool _isSwithPlatform = false;
         private bool _isInternetConnection;
+        private bool _isCheck;
         private SaveLoadService _saveLoadService;
         private List<Employee> _employees = new();
         private List<Equipment> _equipments = new();
@@ -43,38 +54,72 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         private string[] _linesInputLoggPass;
         private string[] _linesInputBoxes;
         private string[] _linesInputTrolleys;
-        private List<string> _textLoggPass = new();
-        private List<string> _textBoxes = new();
-        private List<string> _textTrolleys = new();
-        private List<List<string>> textInFields = new();
-
-
+        private List<string> _textLoggPass= new();
+        private List<string> _textBoxes= new();
+        private List<string> _textTrolleys= new();
+        List<List<string>> textInFields = new();
+        private WarningPanel _warningPanel;
+        public void Init(SaveLoadService saveLoadService, WarningPanel warningPanel)
+        {
+            _warningPanel = warningPanel;
+            _saveLoadService = saveLoadService;
+            AddListeners();
+            _isCheck = true;
+        }
         private void OnCLickSwithPlatform()
         {
             _isSwithPlatform = !_isSwithPlatform;
         }
-
         private void SetUrlId()
         {
             SentLogMessage(" ->Установка   UrlId ");
-
-            if (_inputUrlId.text != "")
+            
+            if (_inputUrlId.text!="")
             {
                 _cvsLoader.SetUrlId(_inputUrlId.text);
             }
         }
-
+        
         private void LoadWebData()
         {
             SentLogMessage(" ->Загрузка WebData ");
             _googleSheetLoader.StartDownload();
         }
 
-        private void OnSheetDownloaded(WebData webData)
+        private void OnSucsessLoadedCertificate(bool isBuyed,WebData webData,string errorMessage)
         {
-            Loaded?.Invoke(webData.Employees, webData.Boxes, webData.Trolleys);
-            SentLogMessage(" Успешная Загрузка WebData ");
-            SussesAreLoaded();
+            if (_isCheck)
+            {
+                if (!isBuyed)
+                {
+                    _saveLoadService.SetSertificate();
+                    _warningPanel.SetErrorMessage(errorMessage);
+                    _warningPanel.ShowWindow(WindowNames.ErrorBuyed.ToString());
+                    StartCoroutine(FinishedPrigramm());
+                }
+                _isCheck=false;
+            }
+            else
+            {
+                if (isBuyed)
+                {
+                    Loaded?.Invoke(webData.Employees, webData.Boxes, webData.Trolleys);
+                    SentLogMessage(" Успешная Загрузка WebData ");
+                    SussesAreLoaded();
+                }
+                else
+                {
+                    _warningPanel.SetErrorMessage(errorMessage);
+                    _warningPanel.ShowWindow(WindowNames.ErrorBuyed.ToString());
+                    StartCoroutine(FinishedPrigramm());
+                }
+            }
+        }
+
+        private IEnumerator FinishedPrigramm()
+        {
+            yield return new WaitForSeconds(5);
+            Application.Quit();
         }
 
         public void LoadData()
@@ -86,16 +131,16 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             {
                 _panelOk.gameObject.SetActive(false);
                 _panelNok.gameObject.SetActive(false);
-
-                if (_isSwithPlatform)
+                
+                if (_isSwithPlatform )
                 {
                     SetTextFromInput();
                 }
-                else
+                else 
                 {
-                    SetTextFromPath();
+                   SetTextFromPath();
                 }
-
+                
                 try
                 {
                     foreach (string line in textInFields[0])
@@ -176,11 +221,12 @@ namespace CodeBase.Infrastracture.AdditionalPanels
                 if (_isSwithPlatform == false)
                 {
                     SetPath();
+
                     SetTextFromPath();
                 }
             }
         }
-
+        
         private void SussesAreLoaded()
         {
             _inputBoxes.text = "";
@@ -192,13 +238,13 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _panelNok.gameObject.SetActive(false);
             _panelOk.gameObject.SetActive(true);
         }
-
+        
         private void SetTextFromPath()
         {
             _textLoggPass.AddRange(File.ReadAllLines(_inputLoggPass.text));
             _textBoxes.AddRange(File.ReadAllLines(_inputBoxes.text));
             _textTrolleys.AddRange(File.ReadAllLines(_inputTrolleys.text));
-
+                           
             textInFields.Clear();
             textInFields.Add(_textLoggPass);
             textInFields.Add(_textBoxes);
@@ -208,23 +254,23 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         private void SetTextFromInput()
         {
             int countInputField = 3;
-            List<TMP_InputField> inputFields = new();
+            List<TMP_InputField> inputFields=new();
             inputFields.Add(_inputLoggPass);
             inputFields.Add(_inputBoxes);
             inputFields.Add(_inputTrolleys);
-
+                    
             for (int i = 0; i < inputFields.Count; i++)
             {
                 int index = 0;
                 string line = "";
 
-                if (inputFields[i].text != "")
+                if (inputFields[i].text!="")
                 {
                     foreach (char simbol in inputFields[i].text)
                     {
-                        if (simbol != '\r' && simbol != '\n')
+                        if (simbol!='\r'&&simbol!='\n')
                         {
-                            if (simbol != '%')
+                            if (simbol!='%')
                             {
                                 line += simbol;
                             }
@@ -258,13 +304,6 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             }
         }
 
-
-        public void Init(SaveLoadService saveLoadService)
-        {
-            _saveLoadService = saveLoadService;
-            AddListeners();
-        }
-
         public void Reset()
         {
             isLoadedEmployees = false;
@@ -272,17 +311,17 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _panelOk.gameObject.SetActive(false);
             _panelNok.gameObject.SetActive(false);
             _apply.interactable = true;
-            _employees = new();
-            _equipments = new();
-            _boxes = new();
-            _trolleys = new();
-            _linesInputLoggPass = null;
-            _linesInputBoxes = null;
-            _linesInputTrolleys = null;
-            _textLoggPass = new();
-            _textBoxes = new();
-            _textTrolleys = new();
-            textInFields = new();
+         _employees = new();
+         _equipments = new();
+         _boxes = new();
+         _trolleys = new();
+         _linesInputLoggPass=null;
+         _linesInputBoxes=null;
+         _linesInputTrolleys=null;
+         _textLoggPass= new();
+         _textBoxes= new();
+         _textTrolleys= new();
+         textInFields = new();
         }
 
         private void AddListeners()
@@ -294,13 +333,19 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _swithPlatform.onClick.AddListener(OnCLickSwithPlatform);
             _setUrlId.onClick.AddListener(SetUrlId);
             _setWebData.onClick.AddListener(LoadWebData);
-            _googleSheetLoader.OnProcessData += OnSheetDownloaded;
+            _googleSheetLoader.SucsessLoadedCertificate += OnSucsessLoadedCertificate;
+            _loggedStatus.onValueChanged.AddListener(SetLoggedStatus);
+        }
+
+        private void SetLoggedStatus(bool isActive)
+        {
+           _saveLoadService.SetLoggedStatus(isActive);
         }
 
         private void SetEquipmentStatus(bool isSelected)
         {
-            _toggleTrolleys.isOn = !isSelected;
-            SentLogMessage("-> Выбрана работа с оборудованием ");
+            _toggleTrolleys.isOn=!isSelected;
+                SentLogMessage("-> Выбрана работа с оборудованием ");
             _saveLoadService.SetSwithEquipmentState(isSelected);
         }
 
@@ -320,7 +365,8 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _swithPlatform.onClick.RemoveListener(OnCLickSwithPlatform);
             _setUrlId.onClick.RemoveListener(SetUrlId);
             _setWebData.onClick.RemoveListener(LoadWebData);
-            _googleSheetLoader.OnProcessData -= OnSheetDownloaded;
+            _googleSheetLoader.SucsessLoadedCertificate -= OnSucsessLoadedCertificate;
+            _loggedStatus.onValueChanged.RemoveListener(SetLoggedStatus);
         }
 
         private void SentLogMessage(string message)
@@ -336,14 +382,14 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         public void SwithState(bool state)
         {
             _panel.SetActive(state);
-
+            
             if (state)
             {
-                _isInternetConnection = _saveLoadService.IsDatabaseLoaded;
+                _isInternetConnection=_saveLoadService.IsDatabaseLoaded;
                 textInFields.Add(_textLoggPass);
                 textInFields.Add(_textBoxes);
                 textInFields.Add(_textTrolleys);
-            }
+            }   
         }
 
         public void OnCLickBackButton()
@@ -357,6 +403,11 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _inputLoggPass.text = "";
             _inputBoxes.text = "";
             _inputTrolleys.text = "";
+        }
+
+        public void CheckBuyed()
+        {
+                _googleSheetLoader.StartDownload();
         }
     }
 }

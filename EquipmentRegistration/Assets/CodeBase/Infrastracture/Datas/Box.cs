@@ -12,6 +12,9 @@ namespace CodeBase.Infrastracture.Datas
         [Serialize] public string Key { get; set; }
 
         [Serialize] public Equipment Equipment { get; set; }
+        [Serialize] public Printer Printer { get; set; }
+        
+        [Serialize] public string Name { get; set; }
 
         public Box(string key, Equipment equipment)
         {
@@ -29,6 +32,26 @@ namespace CodeBase.Infrastracture.Datas
         {
             Busy = false;
             Equipment = new(equipment.SerialNumber);
+        }
+        
+        public void SetPrinter(Printer printer)
+        {
+            Printer = new(printer.SerialNumber);
+            Printer.SetBusy(false);
+        }
+
+        public Printer GetPrinter()
+        {
+            Printer tempPrinter = new Printer(Printer.SerialNumber);
+            tempPrinter.Busy = Printer.Busy;
+            tempPrinter.SetBusy(true);
+            Printer = null;
+            return tempPrinter;
+        }
+
+        public void SetName()
+        {
+            
         }
     }
 }

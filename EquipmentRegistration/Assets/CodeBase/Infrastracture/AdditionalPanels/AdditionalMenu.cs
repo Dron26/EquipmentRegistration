@@ -1,6 +1,7 @@
 using System;
 using CodeBase.Infrastracture.Datas;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace CodeBase.Infrastracture.AdditionalPanels
@@ -15,6 +16,8 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         [SerializeField] private Button _equipmentButton;
         [SerializeField] private Button _backButton;
         [SerializeField] private GameObject _buttonPanel;
+
+        public Action OnBackButtonCLick;
         [SerializeField] private AdminPanel _adminPanel;
         [SerializeField] private ResetPanel _resetPanel;
         [SerializeField] private HistoryPanel _historyPanel;
@@ -22,7 +25,6 @@ namespace CodeBase.Infrastracture.AdditionalPanels
         [SerializeField] private SwichEquipmentAction _swichEquipmentAction;
         [SerializeField] private EmployeeAddPanel _employeeAddPanel;
         
-        public Action OnBackButtonCLick;
 
         private SaveLoadService _saveLoadService;
         private Programm _programm;
@@ -40,7 +42,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _swichEquipmentAction.Init(_saveLoadService, warningPanel);
             _deletePanel.Init(_saveLoadService, warningPanel);
             _historyPanel.Init(_saveLoadService);
-            _adminPanel.Init(_saveLoadService);
+            _adminPanel.Init(_saveLoadService,warningPanel);
             
             _adminPanel.SwithState(false);
             _resetPanel.SwithState(false);
@@ -59,6 +61,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _historyButton.interactable = true;
             _addedButton.interactable = true;
             _deleteButton.interactable = true;
+            
         }
 
         private void Reset()
@@ -226,6 +229,7 @@ namespace CodeBase.Infrastracture.AdditionalPanels
             _programm.OnExitAdmin -= ExitAdmin;
             _programm.OnEnterAdmin -= EnterAdmin;
         }
+
 
         private void OnDisable()
         {

@@ -18,6 +18,7 @@ namespace CodeBase.Infrastracture
         public string Comment { get; set; }
         
         public string TrolleyNumber { get; set; }
+        public string PrinterNumber { get; set; }
         public string InitialLogin { get; set; }
 
         public SentData(string action, string login,string password, string key,[CanBeNull] string shortNumber, string time,string comment)
@@ -33,6 +34,9 @@ namespace CodeBase.Infrastracture
         
         public void SetTrolleyNumber(string trolleyNumber)=> 
             TrolleyNumber = trolleyNumber;
+        
+        public void SetPrinterNumber(string printerNumber)=> 
+            PrinterNumber = printerNumber;
         
         public void SetInitial(string login)=> 
             InitialLogin = login;

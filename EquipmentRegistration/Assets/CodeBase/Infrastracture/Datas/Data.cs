@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CodeBase.Infrastracture.EquipmentGroup;
 using CodeBase.Infrastracture.TrolleyGroup;
 using Unity.VisualScripting;
+using UnityEngine;
 
 namespace CodeBase.Infrastracture.Datas
 {
@@ -12,8 +14,9 @@ namespace CodeBase.Infrastracture.Datas
         [Serialize] public List<Employee> _employees = new();
         [Serialize] public List<Equipment> _equipments = new();
         [Serialize] public List<Box> _boxes = new();
-        [Serialize] public List<int> _keys = new();
+        [Serialize] public List<string> _keys = new();
         [Serialize] public List<Trolley> _trollyes = new();
+        [Serialize] public List<Printer> _printers = new();
         [Serialize] public Employee Employee;
         [Serialize] public Employee _employee;
 
@@ -29,6 +32,16 @@ namespace CodeBase.Infrastracture.Datas
                 {
                     newEmployee.SetBox(employee.Box);
                     newEmployee.SetEquipmentData(employee.DateTakenEquipment);
+
+                    if (employee.Box.Printer != null)
+                    {
+                        newEmployee.Box.SetPrinter(employee.Box.Printer);
+                    }
+                }
+                
+                if (employee.HavePrinter)
+                {
+                    newEmployee.SetPrinter(employee.Printer);
                 }
 
                 if (employee.HaveTrolley)
@@ -43,9 +56,15 @@ namespace CodeBase.Infrastracture.Datas
             foreach (var box in boxes)
             {
                 Box newBox = new Box(box.Key, box.Equipment);
+                if (box.Printer != null)
+                {
+                    newBox.SetPrinter(box.Printer);
+                    _printers.Add(box.Printer);
+                }
+
                 newBox.SetBusy(box.Busy);
                 _boxes.Add(newBox);
-                _keys.Add(Convert.ToInt32(box.Key));
+                _keys.Add(box.Key);
             }
 
             foreach (var trolly in trollyes)
@@ -58,47 +77,58 @@ namespace CodeBase.Infrastracture.Datas
 
         public void SetCurrentEmployeer(Employee employee)
         {
-            foreach (var thisEmployee in _employees)
+            var employeeToUpdate = _employees.FirstOrDefault(e => e.Login == employee.Login);
+
+            if (employeeToUpdate != null)
             {
-                if (thisEmployee.Login == employee.Login)
+                _currentIndex = _employees.IndexOf(employeeToUpdate);
+                _employees[_currentIndex] = new(employee.Login, employee.Password, employee.Permission);
+                ;
+
+                if (employee.HaveBox)
                 {
-                    _currentIndex = _employees.IndexOf(thisEmployee);
-                    _employees[_currentIndex] = new(employee.Login, employee.Password, employee.Permission);
-                    ;
-
-                    if (employee.HaveBox)
-                    {
-                        Box box = new Box(employee.Box.Key, employee.Box.Equipment);
-                        _employees[_currentIndex].SetBox(box);
-                        _employees[_currentIndex].SetEquipmentData(employee.DateTakenEquipment);
-                    }
-
-                    if (employee.HaveTrolley)
-                    {
-                        Trolley trolley = new Trolley(employee.Trolley.Number);
-                        _employees[_currentIndex].SetTrolley(trolley);
-                    }
-
-                    Employee = _employees[_currentIndex];
-
-                    break;
+                    Box box = new Box(employee.Box.Key, employee.Box.Equipment);
+                    _employees[_currentIndex].SetBox(box);
+                    _employees[_currentIndex].SetEquipmentData(employee.DateTakenEquipment);
                 }
+
+                if (employee.HaveTrolley)
+                {
+                    Trolley trolley = new Trolley(employee.Trolley.Number);
+                    _employees[_currentIndex].SetTrolley(trolley);
+                }
+
+                if (employee.HavePrinter)
+                {
+                    Printer printer = new Printer(employee.Printer.SerialNumber);
+                    _employees[_currentIndex].SetPrinter(printer);
+                }
+
+                Employee = _employees[_currentIndex];
             }
         }
 
         public void SetBox(Box box)
         {
-            int key = Convert.ToInt32(box.Key);
-
+            string key = box.Key;
+            int index;
+            
             if (_keys.Contains(key))
             {
-                int index = _boxes.IndexOf(_boxes.Find(x => x.Key == box.Key));
+                index = _boxes.IndexOf(_boxes.Find(x => x.Key == box.Key));
                 _boxes[index].SetBusy(box.Busy);
             }
             else
             {
                 _boxes.Add(box);
-                _keys.Add(Convert.ToInt32(box.Key));
+                index = _boxes.IndexOf(box);
+                _keys.Add(box.Key);
+            }
+
+            if (box.Printer != null)
+            {
+                _boxes[index].SetPrinter(box.Printer);
+                SetPrinter(box.Printer);
             }
         }
 
@@ -132,6 +162,31 @@ namespace CodeBase.Infrastracture.Datas
             }
         }
 
+        public List<Printer> GetPrinters()
+        {
+            return new List<Printer>(_printers);
+        }
+
+        public void SetPrinter(Printer printer)
+        {
+            bool changed = false;
+
+            foreach (Printer thisPrinter in _printers)
+            {
+                if (thisPrinter.SerialNumber == printer.SerialNumber)
+                {
+                    thisPrinter.Busy = printer.Busy;
+                    changed = true;
+                    break;
+                }
+            }
+
+            if (!changed)
+            {
+                _printers.Add(printer);
+            }
+        }
+
         public List<Employee> GetEmployees()
         {
             return new List<Employee>(_employees);
@@ -162,16 +217,31 @@ namespace CodeBase.Infrastracture.Datas
             _employees.Remove(employee);
         }
 
-
         public void RemoveBox(Box box)
         {
+            if (box.Printer!=null)
+            {
+                _printers.Remove(box.Printer);
+            }
+            
             _boxes.Remove(box);
-            _keys.Remove(Convert.ToInt32(box.Key));
+            _keys.Remove(box.Key);
+            
         }
 
         public void RemoveTrolley(Trolley trolley)
         {
             _trollyes.Remove(trolley);
+        }
+
+        public void RemovePrinter(Printer printer)
+        {
+            if (_printers.Contains(printer))
+            {
+                int index = _boxes.IndexOf(_boxes.Find(x => x.Printer.SerialNumber == printer.SerialNumber));
+                _boxes[index].GetPrinter();
+                _printers.Remove(printer);
+            }
         }
     }
 }
